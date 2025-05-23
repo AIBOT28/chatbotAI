@@ -4,18 +4,19 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const axios = require("axios");
+const serverless = require("serverless-http"); // 🆕
 
 const app = express();
-const PORT = 3000;
 const GEMINI_API_KEY = "AIzaSyDGn0h1_hQl1tegCY9nzyn4FTxuip7hc4s";
 
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
 // Route trả dữ liệu JSONL
 app.get("/localdata", (req, res) => {
-  const filePath = path.join(__dirname, "data.jsonl"); // hoặc data.jsonl nếu bạn đổi tên
+  const filePath = path.join(__dirname, "data.jsonl");
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
@@ -24,11 +25,8 @@ app.get("/localdata", (req, res) => {
     }
 
     try {
-      // Tách từng dòng JSONL, bỏ dòng rỗng
       const lines = data.split("\n").filter(line => line.trim() !== "");
-      // Parse từng dòng thành object
       const jsonObjects = lines.map(line => JSON.parse(line));
-
       res.json(jsonObjects);
     } catch (parseErr) {
       console.error("Lỗi parse JSONL:", parseErr);
@@ -37,6 +35,7 @@ app.get("/localdata", (req, res) => {
   });
 });
 
+// Route chat
 app.post("/chat", async (req, res) => {
   const conversation = req.body.conversation;
 
@@ -55,6 +54,8 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running: https://sinhvienhuit.vercel.app/:${PORT}`);
-});
+// ❌ KHÔNG DÙNG: app.listen(PORT, ...);
+
+// ✅ THAY THẾ BẰNG:
+module.exports = app;
+module.exports.handler = serverless(app);
