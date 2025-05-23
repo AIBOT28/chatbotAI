@@ -56,5 +56,5 @@ app.post("/chat", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running: http://localhost:${PORT}`);
+  console.log(`🚀 Server running: https://sinhvienhuit.vercel.app/:${PORT}`);
 });
